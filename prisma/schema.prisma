@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model Organization {
+  id Int  @id @default(autoincrement())
+  username String @unique
+  email String? @unique
+  password String
+  apiKey String?
+
+  users  User[]
+  order  Order[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   
+  name      String?
+  role      String?
+  createdAt DateTime @default(now())
+  
+  userOrganization Organization? @relation(fields : [OrganizationId], references: [id])
+  OrganizationId   Int?
+}
+
+model DeviceOrder {
+  id        Int      @id @default(autoincrement())
+  deviceName String
+}
+
+model Food {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  category    String
+  price       Int
+  imgPath     String?
+  stocks      Int?
+
+  orderItems OrderItem[]
+}
+
+enum OrderStatus {
+  WAITING_PAYMENT
+  PAID
+  CANCELLED
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  orderNumber Int         @unique @default(autoincrement())
+  createdAt DateTime @default(now())
+  createdBy String?
+  tableNumber Int
+  status    OrderStatus   @default(WAITING_PAYMENT)
+  total     Int
+
+  OrganizationId Int
+  organization Organization @relation(fields: [OrganizationId], references: [id])
+
+  sometesting String?
+
+  items OrderItem[]
+  payment Payment[]
+}
+
+
+model OrderItem {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  foodId Int
+  food   Food @relation(fields: [foodId], references: [id])
+
+  name     String
+  price    Int
+  quantity Int
+
+  createdAt DateTime @default(now())
+}
+
+// model PaymentMethod {
+//  id   String @id @default(cuid())
+// name String
+//
+//  payment Payment[]
+// }
+
+enum PaymentType {
+  QRIS
+  TUNAI
+}
+
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+model Payment {
+  id           String      @id @default(cuid())
+  
+  orderNum      Int
+  order        Order @relation(fields: [orderNum], references:[orderNumber])
+
+  method       PaymentType
+  amount       Int
+  cashReceived Int?
+  cashReturned Int?
+  createdAt    DateTime    @default(now())
+
+  status        PaymentStatus @default(PENDING)
+
+}
+
+
+model WaitingList {
+  id               String   @id @default(cuid())
+  customerName     String?
+  numberOfCustomer Int?
+  waitingNumber    Int      @default(autoincrement())
+  waitingStatus    String   @default("Waiting")
+
+  createdAt        DateTime @default(now())
+}
+
+model Testing {
+  id               String   @id @default(cuid())
+}
