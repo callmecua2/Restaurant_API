@@ -1,6 +1,6 @@
 import prisma from "./prisma"
 
-export const generateQRIS = async(req: any, res: any) => {
+export const generateQRISPayment = async(req: any, res: any) => {
     try {
         const {orderId, amount} = req.body;
         

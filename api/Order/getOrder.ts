@@ -1,6 +1,12 @@
 import prisma from "../../lib/prisma";
 
+interface filterOrder { 
+  
+}
+
 export const getOrder = async (req: any, res: any) => {
+
+
   try {
     const getUser = req.user;
     const userIdOrganization = getUser.organizationId;
@@ -11,11 +17,11 @@ export const getOrder = async (req: any, res: any) => {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    if (userRole != "MANAGER" && userRole != "OWNER" && userRole != "CASHIER") {
-      return res.status(400).json({
-        message: "Unauthorized User Access",
-      });
-    }
+    // if (userRole != "MANAGER" && userRole != "OWNER" && userRole != "CASHIER") {
+    //   return res.status(400).json({
+    //     message: "Unauthorized User Access",
+    //   });
+    // }
 
     const getAllOrder = await prisma.order.findMany({
       where: {
@@ -26,12 +32,16 @@ export const getOrder = async (req: any, res: any) => {
         OrganizationId : userIdOrganization
       },
       include : {
-        items : true
+        items : {
+          include : {
+            food : true
+          }
+        }
       }
     });
 
     if (getAllOrder.length < 1) {
-      return res.status(400).json({
+      return res.status(200).json({
         message: "No order yet",
       });
     }

@@ -21,6 +21,7 @@ model Organization {
 
   users  User[]
   order  Order[]
+  food    Food[]
 }
 
 model User {
@@ -50,11 +51,16 @@ model Food {
   stocks      Int?
 
   orderItems OrderItem[]
+  OrganizationId Int
+  organization Organization @relation(fields: [OrganizationId], references: [id])
 }
 
 enum OrderStatus {
   WAITING_PAYMENT
   PAID
+  PREPARED
+  READY
+  COMPLETED
   CANCELLED
 }
 
@@ -73,13 +79,13 @@ model Order {
   sometesting String?
 
   items OrderItem[]
-  payment Payment[]
+  payment Payment?
 }
-
+  
 
 model OrderItem {
   id      String @id @default(uuid())
-  orderId String
+  orderId String 
   order   Order  @relation(fields: [orderId], references: [id])
 
   foodId Int
@@ -115,8 +121,8 @@ enum PaymentStatus {
 model Payment {
   id           String      @id @default(cuid())
   
-  orderNum      Int
-  order        Order @relation(fields: [orderNum], references:[orderNumber])
+  orderId      String @unique
+  order        Order @relation(fields: [orderId], references:[id])
 
   method       PaymentType
   amount       Int

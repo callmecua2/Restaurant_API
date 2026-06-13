@@ -5,6 +5,7 @@ import prisma from "./lib/prisma";
 import OrganizationRoute from "./api/Organization/OrganizationRoute"
 import userRouter from "./api/User/userRouter"
 import orderRoute from "./api/Order/orderRoute"
+import foodRouter from "./api/Food/foodRouter"
 
 const app = express();
 const port = 8080;
@@ -15,6 +16,7 @@ console.log(OrganizationRoute)
 app.use("/Organization", OrganizationRoute)
 app.use("/user", userRouter)
 app.use("/order", orderRoute)
+app.use("/food", foodRouter)
 
 
 app.get("/", (req : any, res: any) => {
