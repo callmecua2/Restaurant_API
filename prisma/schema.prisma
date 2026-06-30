@@ -53,6 +53,8 @@ model Food {
   orderItems OrderItem[]
   OrganizationId Int
   organization Organization @relation(fields: [OrganizationId], references: [id])
+
+  isActive    Boolean  @default(true)
 }
 
 enum OrderStatus {
