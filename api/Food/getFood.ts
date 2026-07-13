@@ -4,6 +4,12 @@ interface StatusOrder {
   status: string;
 }
 
+type filter = {
+  category : string
+  price : number
+}
+
+
 export const getFood = async (req: any, res: any) => {
   try {
     const getUser = req.user;

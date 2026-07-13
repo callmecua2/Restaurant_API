@@ -1,4 +1,4 @@
-import { HashPassword, ComparePassword } from "../../encyption/encryption";
+import { HashPassword, ComparePassword } from "../../encryption/encryption";
 import prisma from "../../lib/prisma";
 
 export const createUser = async(req : any, res : any) => {

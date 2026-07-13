@@ -11,6 +11,12 @@ datasource db {
   provider = "postgresql"
 }
 
+enum OrganizationStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  SUSPENDED
+}
+
 
 model Organization {
   id Int  @id @default(autoincrement())
@@ -18,10 +24,25 @@ model Organization {
   email String? @unique
   password String
   apiKey String?
+  status OrganizationStatus @default(PENDING_VERIFICATION)
 
   users  User[]
   order  Order[]
   food    Food[]
+  category Category[]
+  verification emailVerification[]
+}
+
+model emailVerification {
+  id String @id @default(cuid())
+
+  userOrganization Organization? @relation(fields : [OrganizationId], references: [id], onDelete: Cascade)
+  OrganizationId   Int?
+
+  token String
+  createdAt DateTime @default(now())
+  expiredAt DateTime
+  attempts  Int @default(0) 
 }
 
 model User {
@@ -55,6 +76,21 @@ model Food {
   organization Organization @relation(fields: [OrganizationId], references: [id])
 
   isActive    Boolean  @default(true)
+
+  categories Category []
+}
+
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+
+  OrganizationId Int
+  organization Organization @relation(fields: [OrganizationId], references: [id])
+
+  isActive Boolean @default(true)
+
+  foods Food[]
 }
 
 enum OrderStatus {

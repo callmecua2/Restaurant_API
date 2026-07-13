@@ -1,6 +1,6 @@
 import prisma from "../../lib/prisma";
 import { generateToken } from "../../lib/webtoken";
-import { ComparePassword } from "../../encyption/encryption";
+import { ComparePassword } from "../../encryption/encryption";
 
 export const userLogin = async (req: any, res: any) => {
   try {

@@ -6,6 +6,7 @@ export function generateToken(payload: object) {
   if (!secretKey) {
     throw new Error(emptyKey);
   }
+
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
 }
 
