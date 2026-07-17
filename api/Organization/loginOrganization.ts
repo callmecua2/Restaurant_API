@@ -35,7 +35,7 @@ export const loginOrganization = async (req: any, res: any) => {
       username: validateUser.username,
     });
 
-    res.cookie("login_auth", token, {
+    res.cookie("login_organization", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

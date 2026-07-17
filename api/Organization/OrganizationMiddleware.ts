@@ -8,7 +8,7 @@ export const organizationMiddleware = async (
 ) => {
   try {
     console.log("middleware kena");
-    const token = req.cookies.login_auth;
+    const token = req.cookies.login_organization;
 
     if (!token) {
       return res.status(401).json({

@@ -11,8 +11,8 @@ export const sendEmail = async (token : string) => {
   });
 
   if (error) {
-    return console.error({ error });
+    throw new Error(error.message);
   }
 
-  console.log({ data });
+  return data
 };
