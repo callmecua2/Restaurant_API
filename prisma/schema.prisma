@@ -45,13 +45,27 @@ model emailVerification {
   attempts  Int @default(0) 
 }
 
+
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  RESIGN
+}
+
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String   
-  name      String?
-  role      String?
+  username  String @unique
+  password  String
+  email     String?
+  role      UserRole @default(STAFF)
   createdAt DateTime @default(now())
+  status    UserStatus @default(ACTIVE)
   
   userOrganization Organization? @relation(fields : [OrganizationId], references: [id])
   OrganizationId   Int?

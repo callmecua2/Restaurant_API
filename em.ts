@@ -1,18 +1,48 @@
-import { Resend } from 'resend';
+// import { Resend } from "resend";
+
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// export const sendEmail = async (token : string, mail : string) => {
+//   const { data, error } = await resend.emails.send({
+//     from: "noreply@mail.josuamiduk.web.id",
+//     to: [mail],
+//     subject: "Hello World",
+//     html: `<strong>Code : ${token}</strong>`,
+//   });
+
+//   if (error) {
+//     throw new Error(error.message);
+//   }
+
+//   console.log({data})
+
+//   return data
+// };
+
+// sendEmail("dunia ini kacau", "josuamiduk7@gmail.com")
+
+import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-(async function () {
+console.log("cwd:", process.cwd());
+console.log("env:", process.env.RESEND_API_KEY);
+
+export const sendEmail = async (token : string) => {
   const { data, error } = await resend.emails.send({
-    from: 'Acme <onboarding@resend.dev>',
-    to: ['josua6144@gmail.com'],
-    subject: 'Hello World',
-    html: '<strong>It works!</strong>',
+    from: "noreply@mail.josuamiduk.web.id",
+    to: ["josuamiduk7@gmail.com"],
+    subject: "Hello World",
+    html: `<strong>Code : ${token}</strong>`,
   });
 
   if (error) {
-    return console.error({ error });
+    throw new Error(error.message);
   }
+  console.log(data)
+  return data
 
-  console.log({ data });
-})();
+};
+
+
+sendEmail("123456")

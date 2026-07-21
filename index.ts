@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
@@ -10,6 +11,7 @@ import foodRouter from "./api/Food/foodRouter"
 const app = express();
 const port = 8080;
 
+app.use(morgan('dev'))
 app.use(express.json())
 app.use(cookieParser())
 console.log(OrganizationRoute)
@@ -79,46 +81,46 @@ app.get("/", (req : any, res: any) => {
 
 
 //create login employee
-app.post("/login", async (req, res) => {
-    try {
+// app.post("/login", async (req, res) => {
+//     try {
 
-      const {username, userpassword} = req.body;
+//       const {username, userpassword} = req.body;
 
-      if(!username || !userpassword) {
-       return res.status(400).json({
-        message : "Required form is missing"
-      })
-      }
+//       if(!username || !userpassword) {
+//        return res.status(400).json({
+//         message : "Required form is missing"
+//       })
+//       }
 
-      const findUser = await prisma.user.findFirst({
-        where : {name : username}
-      })
+//       const findUser = await prisma.user.findFirst({
+//         where : {name : username}
+//       })
 
-      if(!findUser) {
-        return res.status(404).json({
-          message : "Cant find user"
-        })
-      }
+//       if(!findUser) {
+//         return res.status(404).json({
+//           message : "Cant find user"
+//         })
+//       }
       
-      const isPaswordMatch = await bcrypt.compare(userpassword, findUser.password)
+//       const isPaswordMatch = await bcrypt.compare(userpassword, findUser.password)
 
-      if(isPaswordMatch) {
-        return res.status(200).json({
-          message : "Login success"
-        })
-      }
+//       if(isPaswordMatch) {
+//         return res.status(200).json({
+//           message : "Login success"
+//         })
+//       }
 
-      else {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+//       else {
+//       return res.status(401).json({ message: "Invalid credentials" });
+//     }
 
-    } catch (error) {
-      console.log(error)
-      return res.status(500).json({
-      message: "Internal server error",
-    });
-    }
-} )
+//     } catch (error) {
+//       console.log(error)
+//       return res.status(500).json({
+//       message: "Internal server error",
+//     });
+//     }
+// } )
 
 
 //create food input

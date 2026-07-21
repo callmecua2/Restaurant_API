@@ -4,17 +4,17 @@ import { ComparePassword } from "../../encryption/encryption";
 
 export const userLogin = async (req: any, res: any) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!email || !password) {
+    if (!username || !password) {
       return res.status(400).json({
         message: "Missing required field",
       });
     }
 
-    if (!email.includes("@")) {
+    if (!username.includes("@")) {
       return res.status(400).json({
-        message: "Invalid email format",
+        message: "Invalid username format",
       });
     }
 
@@ -25,7 +25,7 @@ export const userLogin = async (req: any, res: any) => {
     }
 
     const validateUser = await prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
 
     if (!validateUser) {
@@ -43,7 +43,8 @@ export const userLogin = async (req: any, res: any) => {
     }
 
     const token = generateToken({
-        Username: validateUser.name,
+        UserId : validateUser.id,
+        Username: validateUser.username,
         userRole : validateUser.role,
         organizationId : validateUser.OrganizationId
     });
@@ -58,7 +59,7 @@ export const userLogin = async (req: any, res: any) => {
 
     return res.status(200).json({
       message: "Login Success",
-      username: validateUser.name,
+      username: validateUser.username,
     });
   } catch (error) {
     console.log(error);
