@@ -3,15 +3,10 @@ import prisma from "../../lib/prisma";
 
 export const getAllUSer = async (req : any, res: any) => {
     try {
+
         const auth = req.user
         const getUserOrganizationId = auth.organizationId;
         const getUserOrganizationRole = auth.userRole;
-
-        // if(!getUserOrganizationId) {
-        //     return res.status(400).json({
-        //         message : "Unauthorized User"
-        //     })
-        // }
 
         if(getUserOrganizationRole !== "MANAGER" || getUserOrganizationRole !== "OWNER") {
            return res.status(400).json({
