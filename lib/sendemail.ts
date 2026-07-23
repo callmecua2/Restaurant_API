@@ -115,4 +115,4 @@ export const sendEmail = async (token: string) => {
   return data;
 };
 
-sendEmail("1321864")
+sendEmail("Testing html emailnya bro")

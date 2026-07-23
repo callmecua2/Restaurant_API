@@ -18,8 +18,6 @@ router.post("/logout", logout)
 router.get("/getAllUser", getAllUSer)
 router.get("/profiles", getProfiles)
 router.get("/user/:id", getUserDetail)
-
-
 router.post("/changepassword", changePassword)
 
 

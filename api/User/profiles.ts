@@ -12,6 +12,13 @@ export const getProfiles = async (req: any, res: Response) => {
       where : {
         id : getUserId,
         OrganizationId : getUserOrganizationId
+      }, select : {
+        id : true,
+        username : true,
+        email : true,
+        role : true,
+        createdAt : true,
+        status : true
       }
     })
 
