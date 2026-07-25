@@ -1,8 +1,14 @@
 import prisma from "../../lib/prisma";
 import { generateToken } from "../../lib/webtoken";
 import { ComparePassword } from "../../encryption/encryption";
+import type { Request, Response } from "express";
 
-export const userLogin = async (req: any, res: any) => {
+interface loginRequest {
+  username : string;
+  password : string;
+}
+
+export const userLogin = async (req: Request < {}, {}, loginRequest >, res: Response) => {
   try {
     const { username, password } = req.body;
 
