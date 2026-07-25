@@ -1,17 +1,15 @@
-import type { Response } from "express";
+import type { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
-export const getProfiles = async (req: any, res: Response) => {
+export const getProfiles = async (req: Request, res: Response) => {
   try {
 
     const auth = req.user;
-    const getUserId = auth.UserId;
-    const getUserOrganizationId = auth.organizationId;
 
     const findUser = await prisma.user.findUnique({
       where : {
-        id : getUserId,
-        OrganizationId : getUserOrganizationId
+        id : auth.userId,
+        OrganizationId : auth.organizationId
       }, select : {
         id : true,
         username : true,
