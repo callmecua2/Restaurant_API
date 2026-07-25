@@ -1,9 +1,9 @@
 import { verifyToken } from "./webtoken";
-import type { NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 export const userMiddlerware = async (
-  req: any,
-  res: any,
+  req: Request,
+  res: Response,
   next: NextFunction,
 ) => {
   try {

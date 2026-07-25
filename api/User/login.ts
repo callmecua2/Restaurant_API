@@ -43,8 +43,8 @@ export const userLogin = async (req: any, res: any) => {
     }
 
     const token = generateToken({
-        UserId : validateUser.id,
-        Username: validateUser.username,
+        userId : validateUser.id,
+        userName: validateUser.username,
         userRole : validateUser.role,
         organizationId : validateUser.OrganizationId
     });

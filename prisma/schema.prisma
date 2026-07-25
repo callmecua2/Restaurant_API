@@ -68,7 +68,7 @@ model User {
   status    UserStatus @default(ACTIVE)
   
   userOrganization Organization? @relation(fields : [OrganizationId], references: [id])
-  OrganizationId   Int?
+  OrganizationId   Int
 }
 
 model DeviceOrder {
