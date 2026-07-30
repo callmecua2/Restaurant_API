@@ -1,10 +1,11 @@
+import type { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
 interface filterOrder { 
   
 }
 
-export const getOrder = async (req: any, res: any) => {
+export const getOrder = async (req: Request, res: Response) => {
 
 
   try {

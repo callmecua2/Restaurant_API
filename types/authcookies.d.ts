@@ -1,10 +1,11 @@
 import { Request } from "express";
 import { type JwtPayload } from "jsonwebtoken";
+import { UserRole } from "@prisma/client";
 
 export interface UserPayload extends JwtPayload {
     userId : number;
     userName : string;
-    userRole : string;
+    userRole : UserRole;
     organizationId : number
 }
 
@@ -12,7 +13,7 @@ export interface UserPayload extends JwtPayload {
 declare global {
     namespace Express {
         interface Request {
-            user? : userPayload
+            user : UserPayload
         }
     }
-}
+}   

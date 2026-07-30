@@ -69,6 +69,7 @@ model User {
   
   userOrganization Organization? @relation(fields : [OrganizationId], references: [id])
   OrganizationId   Int
+  createdBy String?
 }
 
 model DeviceOrder {
@@ -121,7 +122,6 @@ model Order {
   orderNumber Int         @unique @default(autoincrement())
   createdAt DateTime @default(now())
   createdBy String?
-  tableNumber Int
   status    OrderStatus   @default(WAITING_PAYMENT)
   total     Int
 

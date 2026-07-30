@@ -1,25 +1,67 @@
+import type { Request, Response } from "express";
 import prisma from "../../lib/prisma";
+import { OrderStatus } from "@prisma/client";
 
-export const createOrder = async (req: any, res: any) => {
+interface OrderItemRequest {
+  foodId: number;
+  quantity: number;
+}
+
+interface OrderItemInput {
+  foodId: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface Order {
+  createdBy?: string;
+  status: OrderStatus;
+  total: number;
+  OrganizationId: number;
+}
+
+export const createOrder = async (
+  req: Request<{}, {}, OrderItemRequest[]>,
+  res: Response,
+) => {
   try {
-    const { orderItems, paymentType } = req.body;
-    const getUser = req.user;
-    const getUserName = getUser.Username;
-    const getUserOrganizationId = getUser.organizationId;
+    const orderItems = req.body;
+    const auth = req.user;
 
-    if (!paymentType) {
+    //check wheter there's orderItems or not
+    if (!orderItems) {
       return res.status(400).json({
-        message: "Missing required field",
+        message: "Bad Request",
       });
     }
 
+    //check orderItems is array or not
     if (!Array.isArray(orderItems) || orderItems.length < 1) {
       return res.status(400).json({
-        message: "Empty Cart",
+        message: "Bad Request",
       });
     }
 
-    const foodId = orderItems.map((item) => item.id);
+    //check quantity is valid or not
+
+    for (const item of orderItems) {
+      const quantity = item.quantity;
+
+      if (
+        typeof quantity !== "number" ||
+        !Number.isInteger(quantity) ||
+        quantity < 1
+      ) {
+        return res.status(400).json({
+          message: "Invalid quantity",
+        });
+      }
+    }
+
+    // check is the food exist in database or not
+
+    const foodId = orderItems.map((item) => item.foodId);
     let totalPrice = 0;
 
     const getItems = await prisma.food.findMany({
@@ -27,14 +69,16 @@ export const createOrder = async (req: any, res: any) => {
         id: {
           in: foodId,
         },
-        OrganizationId : getUserOrganizationId
+        OrganizationId: auth.organizationId,
       },
     });
 
-    const itemsToOrder: any[] = [];
+    const itemsToOrder: OrderItemInput[] = [];
 
-    for (const item of orderItems) {
-      const matchedFoodId = getItems.find((food) => food.id === item.id);
+    for (let i = 0; i < orderItems.length; i++) {
+      const matchedFoodId = getItems.find(
+        (food) => food.id === orderItems[i]?.foodId,
+      );
 
       if (!matchedFoodId) {
         return res.status(400).json({
@@ -42,43 +86,44 @@ export const createOrder = async (req: any, res: any) => {
         });
       }
 
-      const name = matchedFoodId?.name;
-      const price = matchedFoodId?.price || 0;
-      const quantity = item.quantity;
+      const id = matchedFoodId.id;
+      const name = matchedFoodId.name;
+      const price = matchedFoodId.price;
+      let quantity = orderItems[i]?.quantity || 0;
       totalPrice += quantity * price;
 
-      itemsToOrder.push({
-        foodId: item.id,
-        name,
-        price,
-        quantity,
-      });
+      //cek apakah ada duplikat
+      const isDuplicate = itemsToOrder.find((item) => item.foodId === id);
+
+      if (isDuplicate) {
+        isDuplicate.quantity += quantity;
+      } else {
+        itemsToOrder.push({
+          foodId: id,
+          name: name,
+          price: price,
+          quantity: quantity,
+        });
+      }
     }
+
+    const OrderData: Order = {
+      createdBy: auth.userName,
+      status: OrderStatus.WAITING_PAYMENT,
+      total: totalPrice,
+      OrganizationId: auth.organizationId,
+    };
 
     const lockOrder = await prisma.$transaction(async (tx) => {
       const createOrder = await tx.order.create({
-        data: {
-          createdBy: getUserName,
-          tableNumber: 1,
-          status: "WAITING_PAYMENT",
-          total: totalPrice,
-          OrganizationId: getUserOrganizationId,
-        },
+        data: OrderData,
       });
 
-      const createOrderItems = await tx.orderItem.createMany({
+      await tx.orderItem.createMany({
         data: itemsToOrder.map((item) => ({
           ...item,
           orderId: createOrder.id,
         })),
-      });
-
-      const createPayment = await tx.payment.create({
-        data: {
-          orderId: createOrder.id,
-          method: paymentType,
-          amount: createOrder.total,
-        },
       });
 
       return createOrder;
