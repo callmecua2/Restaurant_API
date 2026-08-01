@@ -1,28 +1,17 @@
 import type { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
-interface filterOrder { 
-  
-}
 
 export const getOrder = async (req: Request, res: Response) => {
 
 
   try {
-    const getUser = req.user;
-    const userIdOrganization = getUser.organizationId;
-    const userRole = getUser.userRole;
+    const auth = req.user;
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
-
-    // if (userRole != "MANAGER" && userRole != "OWNER" && userRole != "CASHIER") {
-    //   return res.status(400).json({
-    //     message: "Unauthorized User Access",
-    //   });
-    // }
 
     const getAllOrder = await prisma.order.findMany({
       where: {
@@ -30,7 +19,7 @@ export const getOrder = async (req: Request, res: Response) => {
           gte: todayStart,
           lte: todayEnd,
         },
-        OrganizationId : userIdOrganization
+        OrganizationId : auth.organizationId
       },
       include : {
         items : {
