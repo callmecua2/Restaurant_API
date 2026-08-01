@@ -5,10 +5,21 @@ import prisma from "../../lib/prisma";
 import { generateToken } from "../../lib/webtoken";
 import crypto from "crypto";
 import { sendEmail } from "../../lib/sendemail";
+import jwt from "jsonwebtoken";
+import { type CreateOrganization } from "../../types/authcookies";
 
-export const createOrganization = async (req: Request, res: Response) => {
+interface createUserPayload {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export const createOrganization = async (
+  req: Request<{}, {}, createUserPayload>,
+  res: Response,
+) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password }: createUserPayload = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({
@@ -40,7 +51,7 @@ export const createOrganization = async (req: Request, res: Response) => {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
     // create new organization and email verification function
-    
+
     const createOrganization = await prisma.$transaction(async (tx) => {
       const createNewOrganization = await tx.organization.create({
         data: {
@@ -63,16 +74,20 @@ export const createOrganization = async (req: Request, res: Response) => {
 
       return {
         organizationId: createNewOrganization.id,
-    tokenEmailId: createTokenEmail.id,
-      }
+        tokenEmailId: createTokenEmail.id,
+      };
     });
 
     // create verify account only cookies
 
-    const registrationToken = generateToken({
-      OrganizationId: createOrganization.organizationId,
-      emailVerificationId : createOrganization.tokenEmailId,
-      purpose: "Verify_Email",
+    const registrationPayload = {
+      organizationId: createOrganization.organizationId,
+      emailVerificationId: createOrganization.tokenEmailId,
+      purpose: "verify-email",
+    };
+
+    const registrationToken = jwt.sign(registrationPayload, apiKey, {
+      expiresIn: "1h",
     });
 
     res.cookie("verifyEmail", registrationToken, {
