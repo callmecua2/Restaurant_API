@@ -9,11 +9,17 @@ export interface UserPayload extends JwtPayload {
     organizationId : number
 }
 
+export interface CreateOrganization extends JwtPayload {
+    organizationId : number
+    emailVerificationId : string
+    purpose : string
+}
 
 declare global {
     namespace Express {
         interface Request {
-            user : UserPayload
+            user : UserPayload;
+            emailVerification : CreateOrganization
         }
     }
 }   

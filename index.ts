@@ -6,7 +6,7 @@ import prisma from "./lib/prisma";
 import OrganizationRoute from "./api/Organization/OrganizationRoute"
 import userRouter from "./api/User/userRouter"
 import orderRoute from "./api/Order/orderRoute"
-import foodRouter from "./api/Food/foodRouter"
+import foodRouter from "./api/Food/food.router"
 
 const app = express();
 const port = 8080;
