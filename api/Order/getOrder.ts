@@ -24,7 +24,7 @@ export const getOrder = async (req: Request, res: Response) => {
       include : {
         items : {
           include : {
-            food : true
+            food : true,
           }
         }
       }

@@ -129,6 +129,7 @@ model Order {
   organization Organization @relation(fields: [OrganizationId], references: [id])
 
   sometesting String?
+  orderPaymentStatus  PaymentStatus?
 
   items OrderItem[]
   payment Payment?

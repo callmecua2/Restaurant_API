@@ -1,9 +1,9 @@
+import type { Request, Response } from "express";
 import prisma from "../../lib/prisma";
 
-export const kitchenGetOrder = async (req: any, res: any) => {
+export const kitchenGetOrder = async (req: Request, res: Response) => {
   try {
-    const getUser = req.user;
-    const getUserOrganizationId = getUser.organizationId;
+    const auth = req.user;
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
@@ -15,7 +15,7 @@ export const kitchenGetOrder = async (req: any, res: any) => {
         status: {
           in: ["PAID", "PREPARED", "READY"],
         },
-        OrganizationId: getUserOrganizationId,
+        OrganizationId: auth.organizationId,
         createdAt: {
           gte: todayStart,
           lte: todayEnd,
