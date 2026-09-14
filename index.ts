@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import bcrypt from "bcryptjs";
@@ -21,8 +21,8 @@ app.use("/order", orderRoute)
 app.use("/food", foodRouter)
 
 
-app.get("/", (req : any, res: any) => {
-  res.send("Hello World!");
+app.get("/", (req : Request, res: Response) => {
+  res.sendFile("/index.html")
 });
 
 
