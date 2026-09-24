@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
+import rateLimit from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/prisma";
 import OrganizationRoute from "./api/Organization/OrganizationRoute"
@@ -11,10 +12,18 @@ import foodRouter from "./api/Food/food.router"
 const app = express();
 const port = 8080;
 
+const limiter = rateLimit({
+  windowMs : 15 * 60 * 1000,
+  limit : 100,
+  standardHeaders : true,
+  message : "Too many request, please try again later"
+})
+
+
+app.use(limiter)
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(cookieParser())
-console.log(OrganizationRoute)
 app.use("/Organization", OrganizationRoute)
 app.use("/user", userRouter)
 app.use("/order", orderRoute)

@@ -160,7 +160,7 @@ model OrderItem {
 
 enum PaymentType {
   QRIS
-  TUNAI
+  CASH
 }
 
 

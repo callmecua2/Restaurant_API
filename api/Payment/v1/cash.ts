@@ -3,7 +3,7 @@ import prisma from "../../../lib/prisma";
 
 interface cashPaymentRequest {
   orderId: string;
-  amount: number;
+  cashReceived: number;
 }
 
 export const cashPayment = async (
@@ -13,7 +13,7 @@ export const cashPayment = async (
   try {
     const auth = req.user;
 
-    const { orderId, amount } = req.body;
+    const { orderId, cashReceived } = req.body;
 
     if (!orderId || typeof orderId !== "string") {
       return res.status(400).json({
@@ -21,55 +21,50 @@ export const cashPayment = async (
       });
     }
 
-    if (!amount || typeof amount !== "number" || amount < 1) {
+    if (!cashReceived || typeof cashReceived !== "number" || cashReceived < 1 || !Number.isInteger(cashReceived)) {
       return res.status(400).json({
-        message: "Error : Invalid input amount",
+        message: "Error : Invalid input cashReceived",
       });
     }
 
-    const findOrder = await prisma.order.findUnique({
+    const findOrder = await prisma.order.findFirst({
       where: {
         id: orderId,
         OrganizationId: auth.organizationId,
         status : 'WAITING_PAYMENT',
         payment: {
-          method: "TUNAI",
+          method : 'CASH'
         },
       },
     });
 
     if (!findOrder) {
       return res.status(404).json({
-        message: "Error : Can't find the order / order hasn't been there",
+        message: "Error : Order not found or unavailable for cash payment",
       });
     }
 
-    let change = 0;
-
-    if (amount > findOrder.total) {
-      change = amount - findOrder.total;
-    } else if (amount === findOrder.total) {
-      change = 0;
-    } else {
+    
+    if(cashReceived < findOrder.total) {
       return res.status(400).json({
-        message: "Error : Invalid number of amount",
-      });
-    }
+        message : "Insufficient cash"
+      })
+    }    
+    const change = cashReceived - findOrder.total
 
-    const updatePayment = await prisma.$transaction(async (tx) => {
+    const updateOrder = await prisma.$transaction(async (tx) => {
       await tx.payment.update({
         where: {
           orderId: findOrder.id,
-          status : 'PENDING',
         },
         data: {
-          cashReceived: amount,
+          cashReceived: cashReceived,
           cashReturned: change,
           status: "SUCCESS",
         },
       });
 
-      const updateOrder = await tx.order.update({
+      const orderUpdate = await tx.order.update({
         where: {
           id: findOrder.id,
         },
@@ -88,15 +83,24 @@ export const cashPayment = async (
               quantity: true,
             },
           },
+          status : true,
+          payment : {
+            select : {
+              method : true,
+              cashReceived : true,
+              cashReturned : true,             
+              status : true,
+            }
+          } 
         },
       });
 
-      return updateOrder;
+      return orderUpdate;
     });
 
-    return res.status(201).json({
-      message: "Success create payment",
-      order: updatePayment,
+    return res.status(200).json({
+      message: "Payment Successfully",
+      order: updateOrder,
     });
   } catch (error) {
     console.log(`Error : ${error}`);
